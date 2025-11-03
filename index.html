@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單項式與多項式判斷挑戰賽</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Microsoft JhengHei', sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .game-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .info-item {
+            flex: 1;
+            text-align: center;
+        }
+        .info-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .level-indicator {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .question-container {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #3498db;
+        }
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .option {
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        .option:hover {
+            background-color: #f1f8ff;
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+        .option.selected {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        .feedback {
+            min-height: 60px;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #submit-btn {
+            background: linear-gradient(to right, #2ecc71, #1abc9c);
+            color: white;
+        }
+        #next-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+        #restart-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        #start-btn {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            color: white;
+            margin-top: 20px;
+        }
+        #retry-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+        #reform-btn {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .progress-container {
+            margin-top: 20px;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #2ecc71, #1abc9c);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        .math-expression {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.8rem;
+            margin: 10px 0;
+        }
+        .difficulty-indicator {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .difficulty-easy {
+            color: #2ecc71;
+        }
+        .difficulty-medium {
+            color: #f39c12;
+        }
+        .difficulty-hard {
+            color: #e74c3c;
+        }
+        .timer-warning {
+            color: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+        .student-info-form {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #9b59b6;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .result-container {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #2ecc71;
+            position: relative;
+        }
+        .result-info {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .result-item {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .result-time {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        .result-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 id="game-title">---</h1>
+        <div class="subtitle" id="game-subtitle">---</div>
+        
+        <!-- 學生信息表單 -->
+        <div class="student-info-form" id="student-info-form">
+            <h2>學生信息</h2>
+            <div class="form-group">
+                <label for="student-name">姓名</label>
+                <input type="text" id="student-name" placeholder="請輸入您的姓名" required>
+            </div>
+            <div class="form-group">
+                <label for="student-class">班別</label>
+                <select id="student-class" required>
+                    <option value="">請選擇班別</option>
+                    <option value="初一甲">初一甲</option>
+                    <option value="初一乙">初一乙</option>
+                    <option value="初一丙">初一丙</option>
+                    <option value="初一丁">初一丁</option>
+                    <option value="初一戊">初一戊</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="student-id">學號</label>
+                <input type="number" id="student-id" min="1" max="99" placeholder="請輸入學號" required>
+            </div>
+            <button id="start-btn">開始挑戰</button>
+        </div>
+        
+        <!-- 遊戲面板（初始隱藏） -->
+        <div id="game-panel" style="display: none;">
+            <div class="info-panel">
+                <div class="info-item">
+                    <div class="info-label">答對率</div>
+                    <div id="accuracy" class="info-value">0%</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">難度</div>
+                    <div id="difficulty" class="info-value">簡單</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">剩餘時間</div>
+                    <div id="timer" class="info-value">30</div>
+                </div>
+            </div>
+            
+            <div class="question-container">
+                <div class="question-text" id="question-text">題目載入中...</div>
+                <div class="options-container" id="options-container">
+                    <!-- 選項將通過JavaScript動態生成 -->
+                </div>
+                <div id="difficulty-indicator" class="difficulty-indicator difficulty-easy">當前難度：簡單</div>
+            </div>
+            
+            <div class="feedback" id="feedback">
+                請選擇一個答案
+            </div>
+            
+            <div class="controls">
+                <button id="submit-btn">提交答案</button>
+                <button id="next-btn" style="display:none;">下一題</button>
+                <button id="restart-btn" style="display:none;">重新開始</button>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="progress-text" id="progress-text">簡單難度：答對 0/3 題</div>
+            </div>
+        </div>
+        
+        <!-- 結果面板（初始隱藏） -->
+        <div id="result-panel" class="result-container" style="display: none;">
+            <h2>挑戰結果</h2>
+            <div class="result-time" id="result-time"></div>
+            <div class="result-info">
+                <div class="result-item" id="result-name">姓名：</div>
+                <div class="result-item" id="result-class">班別：</div>
+                <div class="result-item" id="result-id">學號：</div>
+                <div class="result-item" id="result-accuracy">答對率：</div>
+                <div class="result-item" id="result-highest-difficulty">最高難度：</div>
+            </div>
+            <div class="result-buttons">
+                <button id="retry-btn">直接重試</button>
+                <button id="reform-btn">重填資料再試</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 遊戲配置變量
+        const gameName = "單項式與多項式判斷挑戰賽";
+        const timeLimit = 30; // 秒
+
+        // 題目數據庫
+        const questionDatabase = {
+            easy: [
+                {
+                    "question": "2x 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x + 1 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "-5y 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "3a + 2b 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "7 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "4x²y 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x² - 3x + 2 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "-8z³ 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "2x + 3y - 4 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "9xy 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                }
+            ],
+            medium: [
+                {
+                    "question": "2/x 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x² + 2x + 1 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "√x 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "3x²y - 2xy² 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "5 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x + y + z 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "1/(x+1) 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "-7a²b³ 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x² - 4 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "|x| 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                }
+            ],
+            hard: [
+                {
+                    "question": "x² + 2xy + y² 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x + y = 0 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "3x³ - 2x² + x - 5 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x - 3y < 0 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "-4x⁵y²z 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "2x = 6 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "2x + 3 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 1,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x/y 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "5a²b³c⁴ 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 0,
+                    "type": "類型判斷"
+                },
+                {
+                    "question": "x + 2 > 5 為",
+                    "options": ["單項式", "多項式", "以上皆非"],
+                    "correct": 2,
+                    "type": "類型判斷"
+                }
+            ]
+        };
+
+        // 遊戲狀態
+        let currentDifficulty = 'easy';
+        let currentQuestionIndex = 0;
+        let selectedOption = null;
+        let gameActive = false;
+        let timeLeft = timeLimit;
+        let timerInterval = null;
+        let correctInCurrentLevel = 0;
+        let consecutiveWrong = 0; // 連續答錯計數
+        let totalQuestions = 0; // 總答題數
+        let totalCorrect = 0; // 總答對題數
+        let highestDifficulty = 'easy'; // 最高難度
+        let usedQuestions = {
+            easy: [],
+            medium: [],
+            hard: []
+        };
+        
+        // 當前題目
+        let currentQuestion = null;
+
+        // 學生信息
+        let studentInfo = {
+            name: '',
+            class: '',
+            id: ''
+        };
+
+        // DOM 元素
+        const gameTitleElement = document.getElementById('game-title');
+        const gameSubtitleElement = document.getElementById('game-subtitle');
+        const studentInfoForm = document.getElementById('student-info-form');
+        const gamePanel = document.getElementById('game-panel');
+        const resultPanel = document.getElementById('result-panel');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const accuracyElement = document.getElementById('accuracy');
+        const difficultyElement = document.getElementById('difficulty');
+        const timerElement = document.getElementById('timer');
+        const feedbackElement = document.getElementById('feedback');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const startBtn = document.getElementById('start-btn');
+        const retryBtn = document.getElementById('retry-btn');
+        const reformBtn = document.getElementById('reform-btn');
+        const progressElement = document.getElementById('progress');
+        const progressText = document.getElementById('progress-text');
+        const difficultyIndicator = document.getElementById('difficulty-indicator');
+        const resultName = document.getElementById('result-name');
+        const resultClass = document.getElementById('result-class');
+        const resultId = document.getElementById('result-id');
+        const resultAccuracy = document.getElementById('result-accuracy');
+        const resultHighestDifficulty = document.getElementById('result-highest-difficulty');
+        const resultTime = document.getElementById('result-time');
+
+        // 初始化遊戲
+        function initGame() {
+            // 設置遊戲標題和副標題
+            gameTitleElement.textContent = gameName;
+            gameSubtitleElement.textContent = `七年級數學 - 限時${timeLimit}秒挑戰`;
+            
+            currentDifficulty = 'easy';
+            currentQuestionIndex = 0;
+            selectedOption = null;
+            gameActive = true;
+            timeLeft = timeLimit;
+            correctInCurrentLevel = 0;
+            consecutiveWrong = 0;
+            totalQuestions = 0;
+            totalCorrect = 0;
+            highestDifficulty = 'easy';
+            currentQuestion = null;
+            
+            usedQuestions = {
+                easy: [],
+                medium: [],
+                hard: []
+            };
+            
+            updateAccuracy();
+            difficultyElement.textContent = '簡單';
+            updateDifficultyIndicator();
+            updateProgress();
+            
+            // 啟動計時器
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            loadQuestion();
+            
+            // 重置按鈕狀態
+            submitBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+            restartBtn.style.display = 'none';
+            feedbackElement.className = 'feedback';
+            feedbackElement.textContent = '請選擇一個答案';
+            
+            // 重置計時器樣式
+            timerElement.classList.remove('timer-warning');
+        }
+
+        // 載入題目
+        function loadQuestion() {
+            // 從當前難度的題庫中隨機選擇一道未使用過的題目
+            const availableQuestions = questionDatabase[currentDifficulty].filter(
+                (_, index) => !usedQuestions[currentDifficulty].includes(index)
+            );
+            
+            if (availableQuestions.length === 0) {
+                // 如果所有題目都已使用，重置使用記錄
+                usedQuestions[currentDifficulty] = [];
+                // 重新選擇
+                return loadQuestion();
+            }
+            
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            currentQuestion = availableQuestions[randomIndex];
+            
+            // 記錄已使用的題目
+            const actualIndex = questionDatabase[currentDifficulty].indexOf(currentQuestion);
+            usedQuestions[currentDifficulty].push(actualIndex);
+            
+            // 更新問題文本
+            questionText.textContent = currentQuestion.question;
+            
+            // 清空選項容器
+            optionsContainer.innerHTML = '';
+            
+            // 添加選項
+            currentQuestion.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.dataset.index = index;
+                
+                optionElement.addEventListener('click', () => {
+                    if (!gameActive) return;
+                    
+                    // 移除之前的選擇
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // 設置當前選擇
+                    optionElement.classList.add('selected');
+                    selectedOption = index;
+                });
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // 重置選擇
+            selectedOption = null;
+        }
+
+        // 更新答對率
+        function updateAccuracy() {
+            const accuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+            accuracyElement.textContent = `${accuracy}%`;
+        }
+
+        // 提交答案
+        function submitAnswer() {
+            if (selectedOption === null) {
+                feedbackElement.textContent = '請先選擇一個答案！';
+                feedbackElement.className = 'feedback';
+                return;
+            }
+            
+            const isCorrect = selectedOption === currentQuestion.correct;
+            
+            // 更新總答題數
+            totalQuestions++;
+            
+            if (isCorrect) {
+                feedbackElement.textContent = '回答正確！';
+                feedbackElement.className = 'feedback correct';
+                correctInCurrentLevel++;
+                totalCorrect++;
+                consecutiveWrong = 0; // 重置連續答錯計數
+                
+                // 檢查是否需要提升難度
+                if (currentDifficulty === 'easy' && correctInCurrentLevel >= 3) {
+                    currentDifficulty = 'medium';
+                    correctInCurrentLevel = 0;
+                    difficultyElement.textContent = '中等';
+                    updateDifficultyIndicator();
+                    highestDifficulty = 'medium';
+                } else if (currentDifficulty === 'medium' && correctInCurrentLevel >= 3) {
+                    currentDifficulty = 'hard';
+                    correctInCurrentLevel = 0;
+                    difficultyElement.textContent = '困難';
+                    updateDifficultyIndicator();
+                    highestDifficulty = 'hard';
+                }
+            } else {
+                feedbackElement.textContent = `回答錯誤！正確答案是：${currentQuestion.options[currentQuestion.correct]}`;
+                feedbackElement.className = 'feedback incorrect';
+                
+                // 答錯一題扣減一題答對題數
+                if (correctInCurrentLevel > 0) {
+                    correctInCurrentLevel--;
+                }
+                
+                // 更新連續答錯計數
+                consecutiveWrong++;
+                
+                // 檢查是否需要降低難度
+                if (correctInCurrentLevel === 0 && consecutiveWrong >= 2) {
+                    if (currentDifficulty === 'medium') {
+                        currentDifficulty = 'easy';
+                        correctInCurrentLevel = 2; // 設置為2，答對1題即可回到中等難度
+                        difficultyElement.textContent = '簡單';
+                        updateDifficultyIndicator();
+                    } else if (currentDifficulty === 'hard') {
+                        currentDifficulty = 'medium';
+                        correctInCurrentLevel = 2; // 設置為2，答對1題即可回到困難難度
+                        difficultyElement.textContent = '中等';
+                        updateDifficultyIndicator();
+                    }
+                    consecutiveWrong = 0; // 重置連續答錯計數
+                }
+            }
+            
+            updateAccuracy();
+            updateProgress();
+            
+            // 禁用選項點擊
+            gameActive = false;
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.style.cursor = 'default';
+            });
+            
+            // 顯示下一題按鈕
+            submitBtn.style.display = 'none';
+            
+            if (timeLeft > 0) {
+                nextBtn.style.display = 'inline-block';
+            } else {
+                endGame();
+            }
+        }
+
+        // 下一題
+        function nextQuestion() {
+            gameActive = true;
+            selectedOption = null;
+            
+            loadQuestion();
+            
+            // 重置反饋和按鈕
+            feedbackElement.textContent = '請選擇一個答案';
+            feedbackElement.className = 'feedback';
+            submitBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+        }
+
+        // 更新難度指示器
+        function updateDifficultyIndicator() {
+            difficultyIndicator.textContent = `當前難度：${getDifficultyText(currentDifficulty)}`;
+            difficultyIndicator.className = `difficulty-indicator difficulty-${currentDifficulty}`;
+        }
+
+        // 獲取難度文本
+        function getDifficultyText(difficulty) {
+            switch(difficulty) {
+                case 'easy': return '簡單';
+                case 'medium': return '中等';
+                case 'hard': return '困難';
+                default: return '簡單';
+            }
+        }
+
+        // 更新進度
+        function updateProgress() {
+            let progressTextStr = '';
+            
+            if (currentDifficulty === 'easy') {
+                progressTextStr = `簡單難度：答對 ${correctInCurrentLevel}/3 題`;
+            } else if (currentDifficulty === 'medium') {
+                progressTextStr = `中等難度：答對 ${correctInCurrentLevel}/3 題`;
+            } else {
+                progressTextStr = `困難難度：答對 ${correctInCurrentLevel} 題`;
+            }
+            
+            progressText.textContent = progressTextStr;
+            
+            // 計算總體進度
+            let totalProgress = 0;
+            if (currentDifficulty === 'easy') {
+                totalProgress = correctInCurrentLevel * 100 / 3;
+            } else if (currentDifficulty === 'medium') {
+                totalProgress = correctInCurrentLevel * 100 / 3;
+            } else {
+                // 困難難度時進度條維持100%
+                totalProgress = 100;
+            }
+            
+            progressElement.style.width = `${totalProgress}%`;
+        }
+
+        // 更新計時器
+        function updateTimer() {
+            if (!gameActive) return;
+            
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+            
+            // 時間警告
+            if (timeLeft <= 10) {
+                timerElement.classList.add('timer-warning');
+            }
+            
+            // 時間到
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                endGame();
+            }
+        }
+
+        // 結束遊戲
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            // 顯示結果面板
+            showResultPanel();
+        }
+
+        // 顯示結果面板
+        function showResultPanel() {
+            // 隱藏遊戲面板
+            gamePanel.style.display = 'none';
+            
+            // 計算答對率
+            const accuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+            
+            // 更新結果信息
+            resultName.textContent = `姓名：${studentInfo.name}`;
+            resultClass.textContent = `班別：${studentInfo.class}`;
+            resultId.textContent = `學號：${studentInfo.id}`;
+            resultAccuracy.textContent = `答對率：${totalCorrect}/${totalQuestions} (${accuracy}%)`;
+            resultHighestDifficulty.textContent = `最高難度：${getDifficultyText(highestDifficulty)}`;
+            
+            // 獲取當前時間 (UTC+8)
+            const now = new Date();
+            const timezoneOffset = 8 * 60; // UTC+8 的偏移量（分鐘）
+            const localTime = new Date(now.getTime() + timezoneOffset * 60 * 1000);
+            
+            const year = localTime.getUTCFullYear().toString().slice(-2);
+            const month = String(localTime.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(localTime.getUTCDate()).padStart(2, '0');
+            const hours = String(localTime.getUTCHours()).padStart(2, '0');
+            const minutes = String(localTime.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(localTime.getUTCSeconds()).padStart(2, '0');
+            
+            resultTime.textContent = `${gameName} - ${year}/${month}/${day}-${hours}:${minutes}:${seconds}`;
+            
+            // 顯示結果面板
+            resultPanel.style.display = 'block';
+        }
+
+        // 事件監聽
+        submitBtn.addEventListener('click', submitAnswer);
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', initGame);
+        
+        // 開始按鈕事件
+        startBtn.addEventListener('click', function() {
+            const studentName = document.getElementById('student-name').value;
+            const studentClass = document.getElementById('student-class').value;
+            const studentId = document.getElementById('student-id').value;
+            
+            // 簡單驗證
+            if (!studentName || !studentClass || !studentId) {
+                alert('請填寫所有學生信息！');
+                return;
+            }
+            
+            if (studentId < 1 || studentId > 99) {
+                alert('學號必須是1-99之間的數字！');
+                return;
+            }
+            
+            // 保存學生信息
+            studentInfo = {
+                name: studentName,
+                class: studentClass,
+                id: studentId
+            };
+            
+            // 隱藏表單，顯示遊戲面板
+            studentInfoForm.style.display = 'none';
+            gamePanel.style.display = 'block';
+            
+            // 初始化遊戲
+            initGame();
+        });
+        
+        // 直接重試按鈕事件
+        retryBtn.addEventListener('click', function() {
+            // 隱藏結果面板，顯示遊戲面板
+            resultPanel.style.display = 'none';
+            gamePanel.style.display = 'block';
+            
+            // 初始化遊戲（保留個人信息）
+            initGame();
+        });
+        
+        // 重填資料再試按鈕事件
+        reformBtn.addEventListener('click', function() {
+            // 預填原資料
+            document.getElementById('student-name').value = studentInfo.name;
+            document.getElementById('student-class').value = studentInfo.class;
+            document.getElementById('student-id').value = studentInfo.id;
+            
+            // 隱藏結果面板，顯示表單
+            resultPanel.style.display = 'none';
+            studentInfoForm.style.display = 'block';
+        });
+        
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 設置遊戲標題和副標題
+            gameTitleElement.textContent = gameName;
+            gameSubtitleElement.textContent = `七年級數學 - 限時${timeLimit}秒挑戰`;
+        });
+    </script>
+</body>
+</html>
